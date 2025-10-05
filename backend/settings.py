@@ -131,3 +131,9 @@ BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 DECRYPTION_KEY = os.getenv("DECRYPTION_KEY")
 COOKIE_TOKEN = os.getenv("COOKIE_TOKEN")
 
+CELERY_BEAT_SCHEDULE = {
+    "save-tree-data-every-10-min": {
+        "task": "backend.services.tasks.save_tree_data_task",
+        "schedule": 60.0,
+    },
+}
