@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from backend.services.odds_data_gather_service import run_scraper
+
 from backend.services.scaper_service import (
     get_tree_record,
     get_odds,
@@ -36,7 +36,7 @@ class TreeRecordView(BaseAPIView):
         TARGET_URL = "https://d247.com/game-details/4/559593926"
         PASSWORD_FOR_DECRYPT = os.getenv("DECRYPTION_KEY", "cae7b808-8b1e-4f47-87a5-1a4b6a08030e")
 
-        run_scraper(target_url=TARGET_URL, password_for_decrypt=PASSWORD_FOR_DECRYPT)
+        # run_scraper(target_url=TARGET_URL, password_for_decrypt=PASSWORD_FOR_DECRYPT)
         try:
             key = get_decryption_key()
             data = get_tree_record(key)
