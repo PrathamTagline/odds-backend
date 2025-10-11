@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.conf import settings
 
 import os
 from rest_framework.views import APIView
@@ -19,7 +20,7 @@ from rest_framework.generics import ListAPIView
 from .models import Sport, Competition, Event
 from .serializers import EventOnlySerializer, SportSerializer,CompetitionOnlySerializer
 from rest_framework.response import Response
-from backend.permissions import HasTaglineSecretKey
+
 from typing import List, Dict, Any, Optional
 from backend.services.redis_service import redis_service
 load_dotenv()
@@ -110,11 +111,10 @@ class HighlightHomePrivateView(BaseAPIView):
 class SportListView(ListAPIView):
     queryset = Sport.objects.all()
     serializer_class = SportSerializer
-    permission_classes = [HasTaglineSecretKey]
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True, context={'request': request})
         return Response({
             "status": True,
             "message": "Sports fetched successfully",
@@ -123,7 +123,6 @@ class SportListView(ListAPIView):
 
 
 class CompetitionListAPIView(APIView):
-    permission_classes = [HasTaglineSecretKey]
 
     def get(self, request, event_type_id=None):
         try:
@@ -132,8 +131,8 @@ class CompetitionListAPIView(APIView):
             competitions = Competition.objects.filter(sport=sport)
 
             data = {
-                "sport": SportSerializer(sport).data,
-                "competitions": CompetitionOnlySerializer(competitions, many=True).data
+                "sport": SportSerializer(sport, context={'request': request}).data,
+                "competitions": CompetitionOnlySerializer(competitions, many=True, context={'request': request}).data
             }
 
             return Response({
@@ -149,7 +148,6 @@ class CompetitionListAPIView(APIView):
 
 
 class EventListAPIView(APIView):
-    permission_classes = [HasTaglineSecretKey]
     def get(self, request, event_type_id=None, competition_id=None):
         try:
             # Find sport by event_type_id
@@ -170,9 +168,9 @@ class EventListAPIView(APIView):
             return Response({
                 "status": True,
                 "message": "Events fetched successfully",
-                "sport": SportSerializer(sport).data,
-                "competition": CompetitionOnlySerializer(competition).data,
-                "events": EventOnlySerializer(events, many=True).data
+                "sport": SportSerializer(sport, context={'request': request}).data,
+                "competition": CompetitionOnlySerializer(competition, context={'request': request}).data,
+                "events": EventOnlySerializer(events, many=True, context={'request': request}).data
             }, status=status.HTTP_200_OK)
 
         except Sport.DoesNotExist:
@@ -193,10 +191,18 @@ class EventListAPIView(APIView):
 
 
 class EventDataFromRedisView(APIView):
-    permission_classes = [HasTaglineSecretKey]
 
     def post(self, request, *args, **kwargs):
         try:
+            # Manual secret key check
+            header_key = request.headers.get("x-tagline-secret-key")
+            expected_key = getattr(settings, "TAGLINE_SECRET_KEY", None)
+            if not (header_key and expected_key and header_key == expected_key):
+                return Response({
+                    "status": False,
+                    "message": "Invalid secret key"
+                }, status=status.HTTP_403_FORBIDDEN)
+
             event_ids = request.data.get('event_ids', [])
             if not event_ids or not isinstance(event_ids, list):
                 return Response({
