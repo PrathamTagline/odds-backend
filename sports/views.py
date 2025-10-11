@@ -19,7 +19,7 @@ from rest_framework.generics import ListAPIView
 from .models import Sport, Competition, Event
 from .serializers import EventOnlySerializer, SportSerializer,CompetitionOnlySerializer
 from rest_framework.response import Response
-from backend.permissions import HasTaglineSecretKey
+
 from typing import List, Dict, Any, Optional
 from backend.services.redis_service import redis_service
 load_dotenv()
@@ -110,7 +110,6 @@ class HighlightHomePrivateView(BaseAPIView):
 class SportListView(ListAPIView):
     queryset = Sport.objects.all()
     serializer_class = SportSerializer
-    permission_classes = [HasTaglineSecretKey]
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -123,7 +122,6 @@ class SportListView(ListAPIView):
 
 
 class CompetitionListAPIView(APIView):
-    permission_classes = [HasTaglineSecretKey]
 
     def get(self, request, event_type_id=None):
         try:
@@ -149,7 +147,6 @@ class CompetitionListAPIView(APIView):
 
 
 class EventListAPIView(APIView):
-    permission_classes = [HasTaglineSecretKey]
     def get(self, request, event_type_id=None, competition_id=None):
         try:
             # Find sport by event_type_id
@@ -193,7 +190,6 @@ class EventListAPIView(APIView):
 
 
 class EventDataFromRedisView(APIView):
-    permission_classes = [HasTaglineSecretKey]
 
     def post(self, request, *args, **kwargs):
         try:
