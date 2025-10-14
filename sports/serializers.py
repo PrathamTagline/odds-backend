@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
+from django.conf import settings
 from .models import Sport, Competition, Event
 
 
@@ -9,6 +11,7 @@ class SportSerializer(serializers.ModelSerializer):
 
 
 class CompetitionOnlySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Competition
         exclude = ("id","created_at", "updated_at", "created_by", "updated_by","sport")
@@ -21,6 +24,7 @@ class CompetitionWithSportSerializer(serializers.Serializer):
 
 
 class EventOnlySerializer(serializers.ModelSerializer):
+
     event_type_id = serializers.IntegerField(source="sport.event_type_id", read_only=True)
     competition_id = serializers.CharField(source="competition.competition_id", read_only=True)
     exclude = ("id","created_at", "updated_at", "created_by", "updated_by")

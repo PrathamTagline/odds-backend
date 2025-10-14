@@ -42,6 +42,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "backend.middleware.SecretKeyMiddleware",           # Your existing middleware
+    "backend.middleware.TaglineSecretKeyMiddleware", 
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -71,7 +73,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("DB_NAME", "postgres"),
         "USER": os.getenv("DB_USER", "postgres"),
-        "PASSWORD": os.getenv("DB_PASSWORD", ""),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": os.getenv("DB_HOST", "localhost"),
         "PORT": os.getenv("DB_PORT", "5432"),
     }
@@ -130,6 +132,7 @@ CELERY_TIMEZONE = TIME_ZONE
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 DECRYPTION_KEY = os.getenv("DECRYPTION_KEY")
 COOKIE_TOKEN = os.getenv("COOKIE_TOKEN")
+TAGLINE_SECRET_KEY = os.getenv("TAGLINE_SECRET_KEY", "default-secret-key")
 
 CELERY_BEAT_SCHEDULE = {
     "save-tree-data-every-10-min": {
@@ -137,3 +140,6 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": 60.0,
     },
 }
+
+# Make sure this is set
+TAGLINE_SECRET_KEY = os.getenv("TAGLINE_SECRET_KEY", "")
