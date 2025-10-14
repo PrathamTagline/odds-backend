@@ -2,8 +2,9 @@
 from sports.models import Sport, Competition, Event
 from django.db import transaction
 from datetime import datetime
+from backend.decorators import require_tagline_secret
 
-
+@require_tagline_secret
 def save_tree_data(tree_data: dict):
     """
     Save tree data into Sport, Competition, and Event models.

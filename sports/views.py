@@ -24,7 +24,7 @@ from rest_framework.response import Response
 from typing import List, Dict, Any, Optional
 from backend.services.redis_service import redis_service
 load_dotenv()
-
+from backend.decorators import require_tagline_secret
 
 
 from backend.services.scaper_service import (
@@ -107,7 +107,7 @@ class HighlightHomePrivateView(BaseAPIView):
         except Exception as e:
             return self.handle_exception(e)
 
-
+@require_tagline_secret
 class SportListView(ListAPIView):
     queryset = Sport.objects.all()
     serializer_class = SportSerializer
@@ -122,6 +122,7 @@ class SportListView(ListAPIView):
         }, status=status.HTTP_200_OK)
 
 
+@require_tagline_secret
 class CompetitionListAPIView(APIView):
 
     def get(self, request, event_type_id=None):
@@ -147,6 +148,7 @@ class CompetitionListAPIView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
+@require_tagline_secret
 class EventListAPIView(APIView):
     def get(self, request, event_type_id=None, competition_id=None):
         try:
@@ -190,6 +192,7 @@ class EventListAPIView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@require_tagline_secret
 class EventDataFromRedisView(APIView):
 
     def post(self, request, *args, **kwargs):

@@ -42,6 +42,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "backend.middleware.SecretKeyMiddleware",           # Your existing middleware
+    "backend.middleware.TaglineSecretKeyMiddleware", 
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -138,3 +140,6 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": 60.0,
     },
 }
+
+# Make sure this is set
+TAGLINE_SECRET_KEY = os.getenv("TAGLINE_SECRET_KEY", "")

@@ -5,29 +5,12 @@ from .models import Sport, Competition, Event
 
 
 class SportSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        if request:
-            header_key = request.headers.get("x-tagline-secret-key")
-            expected_key = getattr(settings, "TAGLINE_SECRET_KEY", None)
-            if not (header_key and expected_key and header_key == expected_key):
-                raise PermissionDenied("Invalid secret key")
-
     class Meta:
         model = Sport
         exclude = ("id","created_at", "updated_at", "created_by", "updated_by")
 
 
 class CompetitionOnlySerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        if request:
-            header_key = request.headers.get("x-tagline-secret-key")
-            expected_key = getattr(settings, "TAGLINE_SECRET_KEY", None)
-            if not (header_key and expected_key and header_key == expected_key):
-                raise PermissionDenied("Invalid secret key")
 
     class Meta:
         model = Competition
@@ -41,14 +24,6 @@ class CompetitionWithSportSerializer(serializers.Serializer):
 
 
 class EventOnlySerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        if request:
-            header_key = request.headers.get("x-tagline-secret-key")
-            expected_key = getattr(settings, "TAGLINE_SECRET_KEY", None)
-            if not (header_key and expected_key and header_key == expected_key):
-                raise PermissionDenied("Invalid secret key")
 
     event_type_id = serializers.IntegerField(source="sport.event_type_id", read_only=True)
     competition_id = serializers.CharField(source="competition.competition_id", read_only=True)
